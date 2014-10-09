@@ -33,7 +33,7 @@ fun replace (Var(v), x, repl, bindings) = if (String.compare(v, x) = EQUAL) then
 						replace(alphaConverted, x, repl, bindings)
 					end
   				else
-  					replace(term, x, repl, v::bindings)
+  					Lambda(v, replace(term, x, repl, v::bindings))
 			end;
 
 
@@ -48,6 +48,6 @@ fun betaReduce (App(Lambda(x, term), arg), bindings) = replace(term, x, arg, bin
 			else
 				App(leftReduced, right)
 		end         
-  | betaReduce  (Lambda(x, t), bindings) = betaReduce(t, x::bindings)
+  | betaReduce  (Lambda(x, t), bindings) = Lambda(x, betaReduce(t, x::bindings))
   | betaReduce  (x, _) = x; (* bottomed out *)
 
