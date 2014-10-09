@@ -11,9 +11,11 @@ val infy = Lambda("x", App(Var("x"), Var("x")));
 
 fun topLoop(old) = 
 let
+	val _ = print "~>"
 	val input = TextIO.inputLine(TextIO.stdIn);
 	val enteredSomething = Option.isSome(input);
-	val eval = if enteredSomething then Option.valOf(input) else old;
+	val eval = if enteredSomething then Option.valOf(input) else old; (* TODO: trim whitespace and remove newline. 
+																				this "enteredSomething" is also wrong. *)
 in
 	if (String.compare(eval, "quit") = EQUAL) then 
 		OS.Process.exit(OS.Process.success) 
@@ -22,7 +24,10 @@ in
 			val parsed = App(infy, infy); (* parse(input); *)
 			val reduced = betaReduce(parsed, nil);
 			val output = flatten(reduced);
-			val _ = print ("beta ->\n" ^ output)
+			val _ = if enteredSomething then 
+						print ("\n\n--------------------\n\n" ^ eval ^ "~ beta ~>\n" ^ output ^ "\n")
+					else
+						print (output ^ "\n")
 		in
 			topLoop(output)
 		end
