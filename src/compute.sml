@@ -1,19 +1,28 @@
 
 datatype term = Var of string | App of term * term | Lambda of string * term;
 
-fun flatten (Lambda(x, t)) = "L" ^ x ^ ".(" ^ flatten(t) ^ ")"
+fun isMember str strList = List.exists (fn z => String.compare(str, z) = EQUAL) strList;
+
+fun flatten (Lambda(x, t)) = "\\" ^ x ^ ".(" ^ flatten(t) ^ ")"
   | flatten (App(a, b)) = "(" ^ flatten(a) ^ " " ^ flatten(b) ^ ")"
   | flatten (Var(x)) = x;
 
-fun freeVariables (Var(x), bindings) = 
-	if (List.exists (fn z => (String.compare(z, x) = EQUAL)) bindings) then
-		nil
-	else 
-		[x]
-  | freeVariables (App(left, right), bindings) = freeVariables(left, bindings) @ freeVariables(right, bindings) (* better with set union *)
+fun freeVariables (Var(x), bindings) = if isMember x bindings then nil else [x]
+  | freeVariables (App(left, right), bindings) = freeVariables(left, bindings) @ freeVariables(right, bindings) (* would be better with set union *)
   | freeVariables (Lambda(x, t), bindings) = freeVariables(t, x::bindings);
 
-
+fun genSymbol (old, reserved) = if isMember old reserved then
+					if length(reserved) < 26 andalso String.size(old) = 1 then (* we'll try the next letter in the alphabet *)
+						let 
+							val succCh = Char.succ(hd (String.explode(old)))
+						    	val newCh = if succCh <= #"z" then succCh else #"a"
+						in
+							genSymbol(Char.toString(newCh), reserved)
+						end
+					else
+						genSymbol(old ^ "'", reserved)
+				else
+					old;
 
 (* return term[x:=arg] w/ respect to the outer bindings in effect on term (perform alpha-conversion as needed) *)
 fun replace (Var(v), x, repl, bindings) = if (String.compare(v, x) = EQUAL) then repl else Var(v)
@@ -27,7 +36,7 @@ fun replace (Var(v), x, repl, bindings) = if (String.compare(v, x) = EQUAL) then
   			in
   				if (List.exists (fn z => String.compare(v, z) = EQUAL) freeInRepl) then
   					let 
-  						val newV = "j"; (* TODO: pickNew(freeVariables(term, bindings) @ freeInRepl @ bindings); *)
+  						val newV = genSymbol(v, freeVariables(term, bindings) @ freeInRepl @ bindings);
   						val alphaConverted = Lambda(newV, replace(term, v, Var(newV), bindings));
   					in
 						replace(alphaConverted, x, repl, bindings)

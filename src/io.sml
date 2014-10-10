@@ -2,6 +2,7 @@
 (* parse, betaReduce, flatten, display loop goes here *)
 
 use "compute.sml";
+use "parse.sml";
 
 (* TEMP *)
 
