@@ -18,11 +18,11 @@ let
 	val eval = if enteredSomething then Option.valOf(input) else old; (* TODO: trim whitespace and remove newline. 
 																				this "enteredSomething" is also wrong. *)
 in
-	if (String.compare(eval, "quit") = EQUAL) then 
+	if not enteredSomething then 
 		OS.Process.exit(OS.Process.success) 
 	else
 		let
-			val parsed = App(infy, infy); (* parse(input); *)
+			val parsed = parse(Option.valOf(input));
 			val reduced = betaReduce(parsed, nil);
 			val output = flatten(reduced);
 			val _ = if enteredSomething then 
