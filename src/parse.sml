@@ -69,21 +69,24 @@ fun descend (LAMB::STR(x)::DOT::tokens) =
 
   | descend (STR(x)::tokens) = 
 	let
-		val _ = print "ENTERED STR CASE\n"
+		val _ = print "-- TOP DESCEND\n"
 		val ret = descend(tokens);
 		val term = #1 ret;
 		val leftover = #2 ret; (* if WS is on top, this is an app. *)
+		val _ = print "-- TOP HAS LEFT\n"
 		val _ = printTokens(leftover);
 	in
 		case leftover of
 			  WS::leftover => let
-			  		val _ = print "ENTERED SUBCASE CASE\n"
+			  		val _ = print "-- BOTTOM DESCEND\n"
 					val ret = descend(leftover);
+					val _ = print "-- BOTTOM HAS LEFT\n"
 					val _ = printTokens(#2 ret);
+					val _ = if Option.isSome(#1 ret) then (print "and got Some") else (print "and got None!");
 				in
 					(SOME(App(Var(x), Option.getOpt((#1 ret), raise Fail("NoArg_2")))), (#2 ret))
 				end  
-			| RPAREN::leftover => let val _ = print "returning a var before an rparen\n" in (SOME(Var(x)), RPAREN::leftover) end
+			| RPAREN::leftover => let val _ = print "-- returning a var before an rparen\n" in (SOME(Var(x)), RPAREN::leftover) end
 			| leftover => (SOME(Var(x)), leftover)
 	end
 
