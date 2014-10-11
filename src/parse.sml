@@ -87,7 +87,7 @@ fun descend (LAMB::STR(x)::DOT::tokens) =
 					(SOME(App(Var(x), Option.getOpt((#1 ret), raise Fail("NoArg_2")))), (#2 ret))
 				end  
 			| RPAREN::leftover => let val _ = print "-- returning a var before an rparen\n" in (SOME(Var(x)), RPAREN::leftover) end
-			| leftover => (SOME(Var(x)), leftover)
+			| _ => (SOME(Var(x)), leftover)
 	end
 
   | descend (WS::tokens) = (NONE, WS::tokens)
@@ -103,7 +103,7 @@ fun descend (LAMB::STR(x)::DOT::tokens) =
 						(term, tl leftover)
 				end
 
-  | descend (_) = raise Fail("InvalidTokenSequence");
+  | descend (_) = (NONE, nil)
 
 
 fun parse s =
@@ -112,8 +112,9 @@ fun parse s =
 		val tokens = rev(tokenize(cs, nil));
 		(*val _ = printTokens(tokens);*)
 		val parseResult = descend(tokens);
+		val _ = if Option.isSome(#1 parseResult) then print "there is a value" else print "no value";
 	in
-		Option.getOpt((#1 parseResult), raise Fail("OMG"))
+		Option.getOpt((#1 parseResult), raise Fail("getOpt claims no value!"))
 	end;
 
 
