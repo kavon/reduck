@@ -164,14 +164,20 @@ fun parse s =
 
 (* INPUT AND OUTPUT CODE START *)
 
+fun quitProgram _ = let
+                        val _ = print "\n"; (* printing a newline looks nice before quitting *)
+                    in
+                        OS.Process.exit(OS.Process.success)
+                    end
+
 fun topLoop(old) = 
 let
 	val _ = print "~>"
 	val maybeInput = TextIO.inputLine(TextIO.stdIn);
 
-	val input = if Option.isSome(maybeInput) then Option.valOf(maybeInput) else OS.Process.exit(OS.Process.success);
+	val input = if Option.isSome(maybeInput) then Option.valOf(maybeInput) else quitProgram();
 	val isUsingOld = (input = "\n")
-	val eval = if isUsingOld then (if old = "quit" then OS.Process.exit(OS.Process.success) else old) else input
+	val eval = if isUsingOld then (if old = "quit" then quitProgram() else old) else input
 
 	val parsed = parse(eval);
 	val reduced = betaReduce(parsed, nil);
@@ -190,9 +196,13 @@ end;
 
 
 (* "Main" *)
-
-print "\n\nJust start typing your lambda-term, and hit enter to reduce. \n Hitting enter without typing anything continues reduction.\n\n";
-topLoop("quit");
+print "Syntax:\n\n";
+print "<lambda-term> ::= <variable>\n";
+print "              ::= (\\<variable>.<lambda-term>)       abstraction\n";
+print "              ::= (<lambda-term> <lambda-term>)     application\n";
+print "\n<variable>    ::= [a-zA-Z]\n";
+print "\n\nType your lambda-term, and hit enter to reduce. \n Hitting enter without typing anything reduces the previously reduced term. \n To quit, use CTRL+D\n\n";
+val _ = topLoop("quit");
 
 (* "Main" *)
 
