@@ -1,7 +1,7 @@
 reduck
 ======
 
-A little tool that finds the beta normal form (β-nf) of a lambda term step-by-step. The evaluation strategy is to find the left-most application of a lambda abstraction to some term and apply the β-rule. I don't have a proof (at the moment) that for any λ-term, this will always find a β-nf if it exists.
+A tool that finds the [beta normal form](http://en.wikipedia.org/wiki/Beta_normal_form) (β-nf) of a lambda term step-by-step. It's basically an interpreter for an abstract functional programming language that shows each computational step during evaluation. The evaluation strategy is to find the left-most application of a lambda abstraction to some term and apply the β-rule. I don't have a proof (at the moment) that for any λ-term, this will always find a β-nf if it exists... but it probably does.
 
 #### Building
 
@@ -37,12 +37,18 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
     --------------------
 
     (* 
-        plus 1 2, where: 
+        evaluate: plus 1 2
         
+        Where numbers are encoded as Church numerals:
+        0 := (\s.(\z.z))
         1 := (\s.(\z.(s z))) 
         2 := (\s.(\z.(s (s z))))  
-        succ := (\m.(\s.(\z.(s ((m s) z)))))   
+        3 := (\s.(\z.(s (s (s z)))))
+        ... etc 
+
+        and plus is:
         plus := (\m.(\n.((m succ) n)))
+        succ := (\m.(\s.(\z.(s ((m s) z)))))   
     *)
 
 
@@ -65,6 +71,7 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
     --------------------
 
     (* Has no normal form *)
+
 
     ((\x.(x x)) (\y.(y y)))
     ~ beta ~>
