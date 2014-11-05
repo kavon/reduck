@@ -15,7 +15,7 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
 
     <variable>    ::= [a-zA-Z]
 
-#### Example
+#### Examples
 
     ~>(((\x.(\y.x)) y) a)
 
@@ -39,5 +39,15 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
     ((\y.(\x.(\y.y))) (\x.(\y.x)))
     ~>
     (\x.(\y.y))
+    ~>((\x.(x x)) (\y.(y y)))
+
+
+    --------------------
+
+    ((\x.(x x)) (\y.(y y)))
+    ~ beta ~>
+    ((\y.(y y)) (\y.(y y)))
+    ~>
+    ((\y.(y y)) (\y.(y y)))
     ~>
 
