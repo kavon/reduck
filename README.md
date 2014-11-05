@@ -37,7 +37,7 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
     --------------------
 
     (* 
-        add 1 to 2, where: 
+        plus 1 2, where: 
         
         1 := (\s.(\z.(s z))) 
         2 := (\s.(\z.(s (s z))))  
