@@ -49,72 +49,42 @@ fun tokenize (nil, tokens) = tokens
 	
 
 
-fun descend (LAMB::STR(x)::DOT::tokens) = 
+    (* abstraction *)
+fun descend (LPAREN::LAMB::STR(x)::DOT::tokens) = 
 	let
-		val ret = descend(tokens);
-		val term = #1 ret; (* the term we're abstracting over *)
-		val leftover = #2 ret; (* tokens leftover *)
-		val absTerm = Option.getOpt(term, raise Fail("NoLambdaBody"))
+		val (term, leftover) = descend(tokens);
+		val theRest = if List.hd(leftover) = RPAREN then List.tl(leftover) else raise Fail "NoRparenLambda";
 	in
-		case leftover of
-		  WS::leftover => let
-		  	val ret = descend(leftover);
-		  	val term = #1 ret;
-		  	val leftover = #2 ret;
-		  in
-		  	(SOME(App(Lambda(x, absTerm), Option.getOpt(term, raise Fail("NoArg_1")))), leftover)
-		  end
-		| wat => (SOME(Lambda(x, absTerm)), wat)
+		(Lambda(x, term), theRest)
 	end
 
-  | descend (STR(x)::tokens) = 
-	let
-		val _ = print "-- TOP DESCEND\n"
-		val ret = descend(tokens);
-		val term = #1 ret;
-		val leftover = #2 ret; (* if WS is on top, this is an app. *)
-		val _ = print "-- TOP HAS LEFT\n"
-		val _ = printTokens(leftover);
-	in
-		case leftover of
-			  WS::leftover => let
-			  		val _ = print "-- BOTTOM DESCEND\n"
-					val ret = descend(leftover);
-					val _ = print "-- BOTTOM HAS LEFT\n"
-					val _ = printTokens(#2 ret);
-					val _ = if Option.isSome(#1 ret) then (print "and got Some") else (print "and got None!");
-				in
-					(SOME(App(Var(x), Option.getOpt((#1 ret), raise Fail("NoArg_2")))), (#2 ret))
-				end  
-			| RPAREN::leftover => let val _ = print "-- returning a var before an rparen\n" in (SOME(Var(x)), RPAREN::leftover) end
-			| _ => (SOME(Var(x)), leftover)
-	end
+    (* application *)
+  | descend(LPAREN::tokens) =
+  	let
+  		val (lTerm, lRemain) = descend(tokens);
+  		
+  		val rightHalf = if List.hd(lRemain) = WS then List.tl(lRemain) else raise Fail "NoWSApp";
+  		
+  		val (rTerm, rRemain) = descend(rightHalf)
 
-  | descend (WS::tokens) = (NONE, WS::tokens)
-  | descend (RPAREN::tokens) = (NONE, RPAREN::tokens)
-  | descend (LPAREN::tokens) = let
-					val ret = descend(tokens);
-					val term = #1 ret;
-					val leftover = #2 ret;
-				in
-					if (hd leftover) <> RPAREN then
-						raise Fail("UnbalancedParens")
-					else
-						(term, tl leftover)
-				end
+  		val theRest = if List.hd(rRemain) = RPAREN then List.tl(rRemain) else raise Fail "NoRParenApp";
+  	in
+  		(App(lTerm, rTerm), theRest)
+  	end
 
-  | descend (_) = (NONE, nil)
+  	(* variable *)
+  | descend (STR(x)::tokens) = (Var(x), tokens)
+
+  | descend (_) = raise Fail "wat"
 
 
 fun parse s =
 	let
 		val cs = trim(String.explode(s));
 		val tokens = rev(tokenize(cs, nil));
-		(*val _ = printTokens(tokens);*)
-		val parseResult = descend(tokens);
-		val _ = if Option.isSome(#1 parseResult) then print "there is a value" else print "no value";
+		val (term, leftoverTokens) = descend(tokens);
 	in
-		Option.getOpt((#1 parseResult), raise Fail("getOpt claims no value!"))
+		term
 	end;
 
 

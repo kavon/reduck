@@ -3,7 +3,7 @@ datatype term = Var of string | App of term * term | Lambda of string * term;
 
 fun isMember str strList = List.exists (fn z => String.compare(str, z) = EQUAL) strList;
 
-fun flatten (Lambda(x, t)) = "\\" ^ x ^ ".(" ^ flatten(t) ^ ")"
+fun flatten (Lambda(x, t)) = "(\\" ^ x ^ "." ^ flatten(t) ^ ")"
   | flatten (App(a, b)) = "(" ^ flatten(a) ^ " " ^ flatten(b) ^ ")"
   | flatten (Var(x)) = x;
 
