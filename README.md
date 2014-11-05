@@ -1,7 +1,7 @@
 reduck
 ======
 
-A tool that finds the [beta normal form](http://en.wikipedia.org/wiki/Beta_normal_form) (β-nf) of a lambda term step-by-step. It's basically an interpreter for an abstract functional programming language that shows each computational step during evaluation. The evaluation strategy is to find the left-most application of a lambda abstraction to some term and apply the β-rule. I don't have a proof (at the moment) that for any λ-term, this will always find a β-nf if it exists... but it probably does.
+A tool that finds the [beta normal form](http://en.wikipedia.org/wiki/Beta_normal_form) (β-nf) of a lambda term step-by-step. It's basically an interpreter for an abstract functional programming language that shows each computational step during evaluation. The evaluation strategy is to find the left-most application of a lambda abstraction to some term and apply the β-rule. I don't have a proof (at the moment) that for any λ-term, this will always find a β-nf if it exists... but it probably will.
 
 #### Building
 
