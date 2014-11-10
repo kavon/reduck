@@ -62,6 +62,32 @@ fun betaReduce (App(Lambda(x, term), arg), bindings) = replace(term, x, arg, bin
   | betaReduce  (Lambda(x, t), bindings) = Lambda(x, betaReduce(t, x::bindings))
   | betaReduce  (x, _) = x; (* bottomed out *)
 
+
+fun cps (Var(x), bindings) = 
+        let
+            val k = genSymbol("k", [x]) (* pick a fresh variable, aka, make sure x isn't k *)
+        in
+            Lambda(k, App(Var(x), Var(k)))
+        end
+
+   | cps (Lambda(x, term), bindings) = 
+        let
+            val k = genSymbol("k", freeVariables(term, bindings))
+        in
+            Lambda(k, App(Var(k), Lambda(x, cps(term, x::k::bindings))))
+        end
+   | cps (App(x, y), bindings) =
+        let
+            val fv_x = freeVariables(x, bindings)
+            val fv_y = freeVariables(y, bindings)
+            val k = genSymbol("k", fv_x @ fv_y)
+            val m = genSymbol("m", fv_y)
+            val cps_x = cps(x, k::bindings)
+            val cps_y = cps(y, k::m::bindings)
+        in
+            Lambda(k, App(cps_x, Lambda(m, App(App(Var(m), cps_y), Var(k)))))
+        end
+
 (* COMPUTATION CODE END *)
 
 
@@ -175,8 +201,8 @@ let
 	val _ = print "~>"
 	val maybeInput = TextIO.inputLine(TextIO.stdIn);
 
-	val input = if Option.isSome(maybeInput) then Option.valOf(maybeInput) else quitProgram();
-	val isUsingOld = (input = "\n")
+	val input = if Option.isSome(maybeInput) then Option.valOf(maybeInput) else quitProgram(); 
+	val isUsingOld = (input = "\n") (* add case here to take input commands. *)
 	val eval = if isUsingOld then (if old = "quit" then quitProgram() else old) else input
 
 	val parsed = parse(eval);
