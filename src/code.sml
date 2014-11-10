@@ -221,7 +221,7 @@ let
 	val _ = if isUsingOld then 
 						print (output ^ "\n")
 					else
-						print ("\n\n--------------------\n\n" ^ eval ^ "\n~ " ^ mode ^ " ~>\n" ^ output ^ "\n")
+						print ("\n\n--------------------\n\n" ^ eval ^ "\n~" ^ mode ^ "~>\n" ^ output ^ "\n")
 in
 	topLoop(output, mode)
 end;
