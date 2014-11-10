@@ -196,25 +196,34 @@ fun quitProgram _ = let
                         OS.Process.exit(OS.Process.success)
                     end
 
-fun topLoop(old) = 
+fun topLoop(old, mode) = 
 let
-	val _ = print "~>"
+	val _ = print ("~" ^ mode ^ "~>")
 	val maybeInput = TextIO.inputLine(TextIO.stdIn);
+	val input = String.implode(trim (String.explode(if Option.isSome(maybeInput) then Option.valOf(maybeInput) else quitProgram()))); 
 
-	val input = if Option.isSome(maybeInput) then Option.valOf(maybeInput) else quitProgram(); 
-	val isUsingOld = (input = "\n") (* add case here to take input commands. *)
-	val eval = if isUsingOld then (if old = "quit" then quitProgram() else old) else input
 
-	val parsed = parse(eval);
-	val reduced = betaReduce(parsed, nil);
-	val output = flatten(reduced);
+    (* If they just input a mode, switch modes and reissue "old" *)
+    val _ = (case input of "beta" => topLoop(old, "beta")
+                        | "cps" => topLoop(old, "cps")
+                        | "quit" => quitProgram()
+                        | _ => ())
+
+    val isUsingOld = (input = "")
+    val eval = if isUsingOld then (if old = "quit" then quitProgram() else old) else input
+
+	val parsed = parse(eval)
+	val reduced = (case mode of "beta" => betaReduce(parsed, nil)
+                              | "cps" => cps(parsed, nil)
+                              | _ => raise Fail "have no reduction mode set!")
+	val output = flatten(reduced)
 
 	val _ = if isUsingOld then 
 						print (output ^ "\n")
 					else
-						print ("\n\n--------------------\n\n" ^ eval ^ "~ beta ~>\n" ^ output ^ "\n")
+						print ("\n\n--------------------\n\n" ^ eval ^ "\n~ " ^ mode ^ " ~>\n" ^ output ^ "\n")
 in
-	topLoop(output)
+	topLoop(output, mode)
 end;
 
 (* INPUT AND OUTPUT CODE END *)
@@ -227,8 +236,11 @@ print "<lambda-term> ::= <variable>\n";
 print "              ::= (\\<variable>.<lambda-term>)       abstraction\n";
 print "              ::= (<lambda-term> <lambda-term>)     application\n";
 print "\n<variable>    ::= [a-zA-Z]\n";
-print "\n\nType your lambda-term, and hit enter to reduce. \n Hitting enter without typing anything reduces the previously reduced term. \n To quit, use CTRL+D\n\n";
-val _ = topLoop("quit");
+print "\nModes: beta, cps, quit";
+print "\n\nType your lambda-term, and hit enter to reduce.";
+print "\n Hitting enter without typing anything reduces the previously\n reduced term in the current mode.";
+print "\n To change modes, type in a valid mode and hit enter. \n To quit, use CTRL+D or change to quit mode.\n\n";
+val _ = topLoop("quit", "beta");
 
 (* "Main" *)
 

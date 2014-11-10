@@ -70,6 +70,21 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
 
     --------------------
 
+    ((\x.y) z)
+    ~ cps ~>
+    (\k.((\k.(k (\x.(\k.(y k))))) (\m.((m (\k.(z k))) k))))
+    ~cps~>beta
+    ~beta~>
+    (\k.((\m.((m (\k.(z k))) k)) (\x.(\k.(y k)))))
+    ~beta~>
+    (\k.(((\x.(\k.(y k))) (\k.(z k))) k))
+    ~beta~>
+    (\k.((\k.(y k)) k))
+    ~beta~>
+    (\k.(y k))
+
+    --------------------
+
     (* Has no normal form *)
 
 
