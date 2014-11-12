@@ -1,7 +1,7 @@
 reduck
 ======
 
-A tool that can find the [beta normal form](http://en.wikipedia.org/wiki/Beta_normal_form) (β-nf) of a term in the lambda calculus step-by-step. It's basically an interpreter for an abstract functional programming language that shows each computational step during evaluation. The evaluation strategy is to find the left-most application of a lambda abstraction to some term and apply the β-rule. I don't have a proof (at the moment) that for any λ-term, this will always find a β-nf if it exists... but it probably will. 
+A tool that can find the [beta normal form](http://en.wikipedia.org/wiki/Beta_normal_form) (β-nf) of a term in the lambda calculus step-by-step. It's basically an interpreter for an abstract functional programming language that shows each computational step during evaluation. The evaluation strategy is *call by name*, that is, it performs a substitution (β-rule) of the argument in the function without evaluating it, and it chooses the left-most application at each step.
 
 It additionally has a mode that can perform a [continuation-passing style](http://en.wikipedia.org/wiki/Continuation-passing_style) (CPS) transform on a lambda term.
 
@@ -20,11 +20,11 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
 
     Modes: beta, cps, quit
 
-    Type your lambda-term, and hit enter to reduce.
-     Hitting enter without typing anything reduces the previously
-     reduced term in the current mode.
-     To change modes, type in a valid mode and hit enter. 
-     To quit, use CTRL+D or change to quit mode.
+    * Type your lambda-term, and hit enter to reduce.
+    * Hitting enter without typing anything reduces the previously
+        reduced term in the current mode.
+    * To change modes, type in a valid mode and hit enter. 
+    * To quit, use CTRL+D or change to quit mode.
 
 #### Examples
 
@@ -108,5 +108,32 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
     ((\y.(y y)) (\y.(y y)))
     ~beta~>
     ((\y.(y y)) (\y.(y y)))
+
+    --------------------
+
+    (* CPS of first example *)
+
+    (((\x.(\y.x)) y) a)
+    ~cps~>
+    (\k.((\k.((\k.(k (\x.(\k.(k (\y.(\k.(x k)))))))) (\m.((m (\k.(y k))) k)))) (\m.((m (\k.(a k))) k))))
+    ~cps~>beta
+    ~beta~>
+    (\k.((\k.(k (\x.(\k.(k (\y.(\k.(x k)))))))) (\m.((m (\k.(y k))) (\m.((m (\k.(a k))) k))))))
+    ~beta~>
+    (\k.((\m.((m (\k.(y k))) (\m.((m (\k.(a k))) k)))) (\x.(\k.(k (\y.(\k.(x k))))))))
+    ~beta~>
+    (\k.(((\x.(\k.(k (\y.(\k.(x k)))))) (\k.(y k))) (\m.((m (\k.(a k))) k))))
+    ~beta~>
+    (\k.((\k.(k (\z.(\k.((\k.(y k)) k))))) (\m.((m (\k.(a k))) k))))
+    ~beta~>
+    (\k.((\m.((m (\k.(a k))) k)) (\z.(\k.((\k.(y k)) k)))))
+    ~beta~>
+    (\k.(((\z.(\k.((\k.(y k)) k))) (\k.(a k))) k))
+    ~beta~>
+    (\k.((\k.((\k.(y k)) k)) k))
+    ~beta~>
+    (\k.((\k.(y k)) k))
+    ~beta~>
+    (\k.(y k))
 
     
