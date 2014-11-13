@@ -85,16 +85,20 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
 
     ((\x.y) z)
     ~cps~>
-    (\k.((\k.(k (\x.(\k.(y k))))) (\m.((m (\k.(z k))) k))))
+    (\k.((\k.(k z)) (\n.((\k.(k (\x.(\k.(k y))))) (\m.((m n) k))))))
     ~cps~>beta
     ~beta~>
-    (\k.((\m.((m (\k.(z k))) k)) (\x.(\k.(y k)))))
+    (\k.((\n.((\k.(k (\x.(\k.(k y))))) (\m.((m n) k)))) z))
     ~beta~>
-    (\k.(((\x.(\k.(y k))) (\k.(z k))) k))
+    (\k.((\k.(k (\x.(\k.(k y))))) (\m.((m z) k))))
     ~beta~>
-    (\k.((\k.(y k)) k))
+    (\k.((\m.((m z) k)) (\x.(\k.(k y)))))
     ~beta~>
-    (\k.(y k))
+    (\k.(((\x.(\k.(k y))) z) k))
+    ~beta~>
+    (\k.((\k.(k y)) k))
+    ~beta~>
+    (\k.(k y))
 
     --------------------
 
@@ -115,25 +119,31 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
 
     (((\x.(\y.x)) y) a)
     ~cps~>
-    (\k.((\k.((\k.(k (\x.(\k.(k (\y.(\k.(x k)))))))) (\m.((m (\k.(y k))) k)))) (\m.((m (\k.(a k))) k))))
+    (\k.((\k.(k a)) (\n.((\k.((\k.(k y)) (\n.((\k.(k (\x.(\k.(k (\y.(\k.(k x)))))))) (\m.((m n) k)))))) (\m.((m n) k))))))
     ~cps~>beta
     ~beta~>
-    (\k.((\k.(k (\x.(\k.(k (\y.(\k.(x k)))))))) (\m.((m (\k.(y k))) (\m.((m (\k.(a k))) k))))))
+    (\k.((\n.((\k.((\k.(k y)) (\n.((\k.(k (\x.(\k.(k (\y.(\k.(k x)))))))) (\m.((m n) k)))))) (\m.((m n) k)))) a))
     ~beta~>
-    (\k.((\m.((m (\k.(y k))) (\m.((m (\k.(a k))) k)))) (\x.(\k.(k (\y.(\k.(x k))))))))
+    (\k.((\k.((\k.(k y)) (\n.((\k.(k (\x.(\k.(k (\y.(\k.(k x)))))))) (\m.((m n) k)))))) (\m.((m a) k))))
     ~beta~>
-    (\k.(((\x.(\k.(k (\y.(\k.(x k)))))) (\k.(y k))) (\m.((m (\k.(a k))) k))))
+    (\k.((\k.(k y)) (\n.((\k.(k (\x.(\k.(k (\y.(\k.(k x)))))))) (\m.((m n) (\m.((m a) k))))))))
     ~beta~>
-    (\k.((\k.(k (\z.(\k.((\k.(y k)) k))))) (\m.((m (\k.(a k))) k))))
+    (\k.((\n.((\k.(k (\x.(\k.(k (\y.(\k.(k x)))))))) (\m.((m n) (\m.((m a) k)))))) y))
     ~beta~>
-    (\k.((\m.((m (\k.(a k))) k)) (\z.(\k.((\k.(y k)) k)))))
+    (\k.((\k.(k (\x.(\k.(k (\z.(\k.(k x)))))))) (\m.((m y) (\m.((m a) k))))))
     ~beta~>
-    (\k.(((\z.(\k.((\k.(y k)) k))) (\k.(a k))) k))
+    (\k.((\m.((m y) (\m.((m a) k)))) (\x.(\k.(k (\z.(\k.(k x))))))))
     ~beta~>
-    (\k.((\k.((\k.(y k)) k)) k))
+    (\k.(((\x.(\k.(k (\z.(\k.(k x)))))) y) (\m.((m a) k))))
     ~beta~>
-    (\k.((\k.(y k)) k))
+    (\k.((\k.(k (\z.(\k.(k y))))) (\m.((m a) k))))
     ~beta~>
-    (\k.(y k))
+    (\k.((\m.((m a) k)) (\z.(\k.(k y)))))
+    ~beta~>
+    (\k.(((\z.(\k.(k y))) a) k))
+    ~beta~>
+    (\k.((\k.(k y)) k))
+    ~beta~>
+    (\k.(k y))
 
     
