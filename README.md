@@ -83,22 +83,22 @@ You'll need either [MLton](http://mlton.org) or [SML/NJ](http://www.smlnj.org) i
 
     (* cps = continuation passing transform, beta = beta reduction *)
 
-    ((\x.y) z)
+    ((\x.k) z)
     ~cps~>
-    (\k.((\k.(k z)) (\n.((\k.(k (\x.(\k.(k y))))) (\m.((m n) k))))))
+    (\l.((\k.(k z)) (\n.((\l.(l (\x.(\l.(l k))))) (\m.((m n) l))))))
     ~cps~>beta
     ~beta~>
-    (\k.((\n.((\k.(k (\x.(\k.(k y))))) (\m.((m n) k)))) z))
+    (\l.((\n.((\l.(l (\x.(\l.(l k))))) (\m.((m n) l)))) z))
     ~beta~>
-    (\k.((\k.(k (\x.(\k.(k y))))) (\m.((m z) k))))
+    (\l.((\l.(l (\x.(\l.(l k))))) (\m.((m z) l))))
     ~beta~>
-    (\k.((\m.((m z) k)) (\x.(\k.(k y)))))
+    (\l.((\m.((m z) l)) (\x.(\l.(l k)))))
     ~beta~>
-    (\k.(((\x.(\k.(k y))) z) k))
+    (\l.(((\x.(\l.(l k))) z) l))
     ~beta~>
-    (\k.((\k.(k y)) k))
+    (\l.((\l.(l k)) l))
     ~beta~>
-    (\k.(k y))
+    (\l.(l k))
 
     --------------------
 
